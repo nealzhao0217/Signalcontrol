@@ -1,5 +1,5 @@
 // Cheng Zhao 
-// refer to Zerui An Bluetooth.v
+// refer to Zerui An Bluetooth_top.v
 // FPGA for Robotics Education
 //------------------------------------------------------------------------------
 // Robotcontrol
