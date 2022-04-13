@@ -49,21 +49,26 @@ module fpga_top (
     always @(*) begin
         left_next = 8'b0;
         right_next = 8'b0;
-        if (Rx_data[6] == 0)
+        if (Rx_data[6] == 0) begin
             left = {1,Rx_data[6:0]};
             left_next = left;
             right = right_next;
-        else
+        end 
+        else begin
             right = {1,Rx_data[6:0]};
             right_next = right;
             left = left_next;
+        end
     end    
-
-    assign motorL_pwm = left[4:0];
-    assign motorR_pwm = right[4:0]; 
-    assign motorL_dir = left[5];
-    assign motorR_dir = right[5];
-    assign motorL_en = left[6];
-    assign motorR_en = right[6];
+    
+    speedctl(WF_clk,WF_button,motorL_encdr,left_next[4:0],PWM_L);
+    speedctl(WF_clk,WF_button,motorR_encdr,right_next[4:0],PWM_R);
+    
+    assign motorL_pwm = PWM_L;
+    assign motorR_pwm = PWM_R; 
+    assign motorL_dir = left_next[5];
+    assign motorR_dir = right_next[5];
+    assign motorL_en = left_next[6];
+    assign motorR_en = right_next[6];
             
 endmodule          
