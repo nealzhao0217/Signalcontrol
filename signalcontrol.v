@@ -1,8 +1,8 @@
 // Cheng Zhao 
-// refer to Zerui An Bluetooth_top.v
+// Refer to Zerui An - Bluetooth_top.v
 // FPGA for Robotics Education
 //------------------------------------------------------------------------------
-// Robotcontrol
+// Robot Control
 
 module fpga_top (
     input wire WF_CLK, WF_BUTTON,
@@ -21,12 +21,11 @@ module fpga_top (
 // Disable all the unused signals
 assign ir_evenLED = 0;
 assign ir_oddLED = 0;
-assign motorL_pwm = 0;
-assign motorR_pwm = 0;
-assign motorL_en = 0;
-assign motorR_en = 0;
-assign motorL_dir = 0;
-assign motorR_dir = 0;
+assign WF_LED = 0;
+assign ledFL = 0;
+assign ledFR = 0;
+assign ledBL = 0;
+assign ledBR = 0;
 
 wire Rx, Tx; // Bluetooth Rx and Tx signals
 assign Rx = ir_snsrch0;
@@ -35,14 +34,34 @@ assign ir_snsrch1 = Tx; // Map Bluetooth signals to ir sensor pins
 assign Tx = 1'b1; // We are not using Tx in this example
 
 wire [7:0] Rx_data; // Connected to the bluetooth Rx module
-reg [7:0] counter, counter_next; // blink counter
-reg [31:0] timer, timer_next;
-
-localparam SECOND = 32'd16000000;
-localparam SLEEP = 4'b0;
-localparam BLINK = 4'b1;
-
-reg [3:0] state, state_next;
-reg led_next;
+reg [7:0] left, left_next;
+reg [7:0] right, right_next;
+    
+localparam REST = 8'b0;
 
 Rx_wrapper receiver(WF_CLK, ~WF_BUTTON, Rx, Rx_data);
+    
+assign motorL_pwm = Rx_data[4:0];
+assign motorR_pwm = Rx_data[4:0]; 
+assign motorL_dir = Rx_data[5];
+assign motorR_dir = Rx_data[5];
+assign motorL_en = Rx_data[6];
+assign motorR_en = Rx_data[6];
+
+always @(posedge WF_CLK) begin
+    left <= WF_BUTTON ? left_next : REST;
+    right <= WF_BUTTON ? right_next : REST;
+end    
+    
+always @(*) begin
+    if (Rx_data[6] == 0)
+        left = Rx_data[7:0];
+        left_next = left;
+        right = 8'b0;
+    else
+        right = Rx_data[7:0];
+        right_next = right;
+        left = 8'b0;
+    
+            
+            
